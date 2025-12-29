@@ -39,6 +39,9 @@ val optionalArgDesc =
   \  [-indent-width I]          use <I> spaces for indentation in output\n\
   \                             (default 2)\n\
   \\n\
+  \  [-mlb-path-map FILE]       load a path map file (key-value pairs,\n\
+  \                             one per line)\n\
+  \\n\
   \  [-mlb-path-var 'K V']      MLton-style path variable\n\
   \\n\
   \  [-engine E]                Select a pretty printing engine.\n\
@@ -87,6 +90,7 @@ fun usage () =
   ^ optionalArgDesc
 
 
+val mlbPathMaps = CommandLineArgs.parseStrings "mlb-path-map"
 val mlbPathVars = CommandLineArgs.parseStrings "mlb-path-var"
 val ribbonFrac = CommandLineArgs.parseReal "ribbon-frac" 1.0
 val maxWidth = CommandLineArgs.parseInt "max-width" 80
@@ -187,6 +191,7 @@ val prettyPrinter =
 
 
 val pathmap = MLtonPathMap.getPathMap ()
+val pathmap = List.concat (List.map MLtonPathMap.fromFile mlbPathMaps) @ pathmap
 val pathmap =
   List.concat (List.map MLtonPathMap.fromString mlbPathVars) @ pathmap
 
