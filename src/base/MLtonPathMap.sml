@@ -10,6 +10,7 @@ sig
 
   val getPathMap: unit -> pathmap
   val fromString: string -> pathmap
+  val fromFile: string -> pathmap
   val lookup: pathmap -> string -> string option
 
   (** Recursively expand a path until convergence. In addition to the
@@ -36,6 +37,12 @@ struct
         | _ => NONE
     in
       List.mapPartial parseLine lines
+    end
+
+
+  fun fromFile filepath =
+    let val contents = ReadFile.contents filepath
+    in fromString contents
     end
 
 
