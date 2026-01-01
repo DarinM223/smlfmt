@@ -6,13 +6,9 @@ configurable, and usable for large projects.
 All of the SML code in this repository (everything in
 `src`) has been formatted by `smlfmt`. Take a look!
 
-**(May 2, 2025)** Released v1.2.0!
+**(Jan 1, 2026)** Released v1.3.0.
 
-**(Nov 2, 2023)** Released v1.1.0!
-
-**(Jan 10, 2023)** Released v1.0.0!
-
-**(Dec 29, 2022)** changed repository name to `smlfmt` (used to be `parse-sml`).
+**(May 2, 2025)** Released v1.2.0.
 
 ## Features
 - Full support for Standard ML according to the formal definition.
@@ -93,6 +89,10 @@ No interactive confirmation, and no files will be modified.
 
 `-mlb-path-var '<key> <value>'` for handling path variables, similar to
 [MLton's path maps](http://mlton.org/MLBasisPathMap).
+
+`-mlb-path-map FILE` to load a
+[MLton path map](http://mlton.org/MLBasisPathMap). Each line should be one
+key-value entry.
 
 `-ribbon-frac <real>` (default 1.0) controls pretty-printing. The
 ribbon-frac (between 0 and 1) controls how dense each line is, excluding
