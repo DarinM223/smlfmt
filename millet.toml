@@ -1,0 +1,6 @@
+version = 1
+[workspace]
+root = "src/smlfmt.mlb"
+[diagnostics]
+5043.severity = "ignore"
+4037.severity = "ignore"
