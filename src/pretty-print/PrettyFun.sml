@@ -33,23 +33,23 @@ struct
           (token strid ++ space ++ token colon ++ space ++ showSigExp sigexp)
 
   fun showFunDec (Ast.Fun.DecFunctor {functorr, elems, delims}) =
-    let
-      fun showFunctor
-        (starter, {funid, lparen, funarg, rparen, constraint, eq, strexp}) =
-        separateWithSpaces [SOME (token starter), SOME (token funid)]
-        \\
-        separateWithSpaces
-          [ SOME (token lparen ++ showFunArg funarg ++ token rparen)
-          , Option.map (fn {colon, sigexp} => token colon) constraint
-          ]
-        \\
-        separateWithSpaces
-          [ Option.map (fn {colon, sigexp} => showSigExp sigexp) constraint
-          , SOME (token eq)
-          ] \\ showStrExp strexp
-    in
-      rigidVertically (showFunctor (functorr, Seq.nth elems 0))
-        (Seq.map showFunctor (Seq.zip (delims, Seq.drop elems 1)))
-    end
+  let
+    fun showFunctor
+      (starter, {funid, lparen, funarg, rparen, constraint, eq, strexp}) =
+      separateWithSpaces [SOME (token starter), SOME (token funid)]
+      \\
+      separateWithSpaces
+        [ SOME (token lparen ++ showFunArg funarg ++ token rparen)
+        , Option.map (fn {colon, sigexp} => token colon) constraint
+        ]
+      \\
+      separateWithSpaces
+        [ Option.map (fn {colon, sigexp} => showSigExp sigexp) constraint
+        , SOME (token eq)
+        ] \\ showStrExp strexp
+  in
+    rigidVertically (showFunctor (functorr, Seq.nth elems 0))
+      (Seq.map showFunctor (Seq.zip (delims, Seq.drop elems 1)))
+  end
 
 end

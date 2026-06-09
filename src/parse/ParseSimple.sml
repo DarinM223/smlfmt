@@ -34,12 +34,12 @@ struct
 
 
   fun check toks f i =
-    let
-      val numToks = Seq.length toks
-      fun tok i = Seq.nth toks i
-    in
-      i < numToks andalso f (tok i)
-    end
+  let
+    val numToks = Seq.length toks
+    fun tok i = Seq.nth toks i
+  in
+    i < numToks andalso f (tok i)
+  end
 
 
   fun isReserved toks rc i =

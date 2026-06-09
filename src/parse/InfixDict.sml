@@ -82,18 +82,18 @@ struct
         raise Fail "Impossible! Bug in InfixDict"
 
   fun find d tok =
-    let
-      val str = Token.toString tok
-      fun loop d =
-        case d of
-          [] => NONE
-        | top :: ds =>
-            case D.find top str of
-              SOME xx => SOME xx
-            | _ => loop ds
-    in
-      loop d
-    end
+  let
+    val str = Token.toString tok
+    fun loop d =
+      case d of
+        [] => NONE
+      | top :: ds =>
+          case D.find top str of
+            SOME xx => SOME xx
+          | _ => loop ds
+  in
+    loop d
+  end
 
   fun isInfix d tok =
     case find d tok of

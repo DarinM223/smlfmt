@@ -20,13 +20,13 @@ end =
 struct
 
   fun getTime f =
-    let
-      val t0 = Time.now ()
-      val result = f ()
-      val t1 = Time.now ()
-    in
-      (result, Time.- (t1, t0))
-    end
+  let
+    val t0 = Time.now ()
+    val result = f ()
+    val t1 = Time.now ()
+  in
+    (result, Time.- (t1, t0))
+  end
 
   fun equalLists eq ([], []) = true
     | equalLists eq (x :: xs, y :: ys) =
@@ -37,20 +37,20 @@ struct
     if lo >= hi then b else loop (lo + 1, hi) (f (b, lo)) f
 
   fun all (lo, hi) f =
-    let
-      fun allFrom i =
-        (i >= hi) orelse (f i andalso allFrom (i + 1))
-    in
-      allFrom lo
-    end
+  let
+    fun allFrom i =
+      (i >= hi) orelse (f i andalso allFrom (i + 1))
+  in
+    allFrom lo
+  end
 
   fun exists (lo, hi) f =
-    let
-      fun existsFrom i =
-        i < hi andalso (f i orelse existsFrom (i + 1))
-    in
-      existsFrom lo
-    end
+  let
+    fun existsFrom i =
+      i < hi andalso (f i orelse existsFrom (i + 1))
+  in
+    existsFrom lo
+  end
 
   fun for (lo, hi) f =
     if lo >= hi then () else (f lo; for (lo + 1, hi) f)

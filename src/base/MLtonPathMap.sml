@@ -29,21 +29,21 @@ struct
 
 
   fun fromString str =
-    let
-      val lines = String.tokens (fn c => c = #"\n") str
-      fun parseLine ln =
-        case String.tokens Char.isSpace ln of
-          [key, value] => SOME (key, value)
-        | _ => NONE
-    in
-      List.mapPartial parseLine lines
-    end
+  let
+    val lines = String.tokens (fn c => c = #"\n") str
+    fun parseLine ln =
+      case String.tokens Char.isSpace ln of
+        [key, value] => SOME (key, value)
+      | _ => NONE
+  in
+    List.mapPartial parseLine lines
+  end
 
 
   fun fromFile filepath =
-    let val contents = ReadFile.contents filepath
-    in fromString contents
-    end
+  let val contents = ReadFile.contents filepath
+  in fromString contents
+  end
 
 
   fun getPathMap () =
@@ -73,89 +73,82 @@ struct
 
 
   fun tryExpandField (pathmap: pathmap) (field: string) =
-    let
-      val n = String.size field
-      fun c i = String.sub (field, i)
-      fun slice (i, j) =
-        String.substring (field, i, j - i)
+  let
+    val n = String.size field
+    fun c i = String.sub (field, i)
+    fun slice (i, j) =
+      String.substring (field, i, j - i)
 
 
-      fun findNextKeyStart (i: int) =
-        if i >= n then
-          NONE
-        else if i + 1 < n andalso c i = #"$" andalso c (i + 1) = #"(" then
-          SOME i
-        else
-          findNextKeyStart (i + 1)
+    fun findNextKeyStart (i: int) =
+      if i >= n then NONE
+      else if i + 1 < n andalso c i = #"$" andalso c (i + 1) = #"(" then SOME i
+      else findNextKeyStart (i + 1)
 
 
-      fun findNextKeyEnd (i: int) =
-        if i >= n then NONE
-        else if c i = #")" then SOME (i + 1)
-        else findNextKeyEnd (i + 1)
+    fun findNextKeyEnd (i: int) =
+      if i >= n then NONE
+      else if c i = #")" then SOME (i + 1)
+      else findNextKeyEnd (i + 1)
 
 
-      fun finishLoop (usedKeys, acc) =
-        (usedKeys, String.concat (List.rev acc))
+    fun finishLoop (usedKeys, acc) =
+      (usedKeys, String.concat (List.rev acc))
 
-      (** Example:
-        *   abc$(foo)def$(bar)...
-        *                     ^
-        *                     i
-        *   acc is ["abc", X, "def", Y], but in reverse order,
-        *   where X = replacement for foo and similarly Y for bar.
-        *)
-      fun loop usedKeys acc i =
-        if i >= n then
-          finishLoop (usedKeys, acc)
-        else
-          case findNextKeyStart i of
-            NONE => finishLoop (usedKeys, slice (i, n) :: acc)
-          | SOME j =>
-              case findNextKeyEnd (j + 2) of
-                NONE => finishLoop (usedKeys, slice (i, n) :: acc)
-              | SOME k =>
-                  let
-                    val prefix = slice (i, j)
-                    val key = slice (j + 2, k - 1)
-                  in
-                    case lookup pathmap key of
-                      NONE => loop usedKeys (slice (j, k) :: prefix :: acc) k
-                    | SOME v => loop (key :: usedKeys) (v :: prefix :: acc) k
-                  end
+    (** Example:
+      *   abc$(foo)def$(bar)...
+      *                     ^
+      *                     i
+      *   acc is ["abc", X, "def", Y], but in reverse order,
+      *   where X = replacement for foo and similarly Y for bar.
+      *)
+    fun loop usedKeys acc i =
+      if i >= n then
+        finishLoop (usedKeys, acc)
+      else
+        case findNextKeyStart i of
+          NONE => finishLoop (usedKeys, slice (i, n) :: acc)
+        | SOME j =>
+            case findNextKeyEnd (j + 2) of
+              NONE => finishLoop (usedKeys, slice (i, n) :: acc)
+            | SOME k =>
+                let
+                  val prefix = slice (i, j)
+                  val key = slice (j + 2, k - 1)
+                in
+                  case lookup pathmap key of
+                    NONE => loop usedKeys (slice (j, k) :: prefix :: acc) k
+                  | SOME v => loop (key :: usedKeys) (v :: prefix :: acc) k
+                end
 
-      val (usedKeys, expanded) = loop [] [] 0
-    in
-      if List.null usedKeys then NONE else SOME (usedKeys, expanded)
-    end
+    val (usedKeys, expanded) = loop [] [] 0
+  in
+    if List.null usedKeys then NONE else SOME (usedKeys, expanded)
+  end
 
 
   fun expandPath pathmap path =
-    let
-      fun expandField field =
-        case tryExpandField pathmap field of
-          NONE => ([], [field])
-        | SOME (usedKeys, field') =>
-            let
-              val (usedKeys', field'') = expand
-                (FilePath.toFields (FilePath.fromUnixPath field'))
-            in
-              (usedKeys' @ usedKeys, field'')
-            end
+  let
+    fun expandField field =
+      case tryExpandField pathmap field of
+        NONE => ([], [field])
+      | SOME (usedKeys, field') =>
+          let
+            val (usedKeys', field'') = expand
+              (FilePath.toFields (FilePath.fromUnixPath field'))
+          in
+            (usedKeys' @ usedKeys, field'')
+          end
 
-      and expand (fields: string list) =
-        let
-          val expanded = List.map expandField fields
-        in
-          ( List.concat (List.map #1 expanded)
-          , List.concat (List.map #2 expanded)
-          )
-        end
-
-      val (usedKeys, result) = expand (FilePath.toFields path)
-    in
-      {result = FilePath.fromFields result, used = usedKeys}
+    and expand (fields: string list) =
+    let val expanded = List.map expandField fields
+    in (List.concat (List.map #1 expanded), List.concat (List.map #2 expanded))
     end
+
+    val (usedKeys, result) = expand (FilePath.toFields path)
+  in
+    {result = FilePath.fromFields result, used = usedKeys}
+  end
 
 (* val expandPath = fn pathmap => fn path =>
   let

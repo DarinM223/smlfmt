@@ -235,32 +235,32 @@ struct
     | _ => true
 
   fun foreground color t =
-    let val (a, t) = splitAttributes t
-    in Attributes {size = size t, attr = setForeground a color, child = t}
-    end
+  let val (a, t) = splitAttributes t
+  in Attributes {size = size t, attr = setForeground a color, child = t}
+  end
 
   fun background color t =
-    let val (a, t) = splitAttributes t
-    in Attributes {size = size t, attr = setBackground a color, child = t}
-    end
+  let val (a, t) = splitAttributes t
+  in Attributes {size = size t, attr = setBackground a color, child = t}
+  end
 
   fun backgroundIfNone color t =
     if hasNoBackground t then background color t else t
 
   fun bold t =
-    let val (a, t) = splitAttributes t
-    in Attributes {size = size t, attr = setBold a, child = t}
-    end
+  let val (a, t) = splitAttributes t
+  in Attributes {size = size t, attr = setBold a, child = t}
+  end
 
   fun italic t =
-    let val (a, t) = splitAttributes t
-    in Attributes {size = size t, attr = setItalic a, child = t}
-    end
+  let val (a, t) = splitAttributes t
+  in Attributes {size = size t, attr = setItalic a, child = t}
+  end
 
   fun underline t =
-    let val (a, t) = splitAttributes t
-    in Attributes {size = size t, attr = setUnderline a, child = t}
-    end
+  let val (a, t) = splitAttributes t
+  in Attributes {size = size t, attr = setUnderline a, child = t}
+  end
 
   fun clear t =
     case t of
@@ -280,37 +280,37 @@ struct
         end
 
   fun toString {colors} t =
-    let
-      fun traverse attr acc t =
-        case t of
-          Append {left, right, ...} =>
-            traverse attr (traverse attr acc left) right
-        | Attributes {attr = attr', child, ...} =>
-            traverse (mergeAttributes attr attr') acc child
-        | Empty => acc
-        | String s =>
-            if not colors then
-              s :: acc
-            else
-              let
-                val acc =
-                  case #foreground attr of
-                    NONE => acc
-                  | SOME c => TC.foreground c :: acc
-                val acc =
-                  case #background attr of
-                    NONE => acc
-                  | SOME c => TC.background c :: acc
-                val acc = if #bold attr then TC.bold :: acc else acc
-                val acc = if #underline attr then TC.underline :: acc else acc
-                val acc = if #italic attr then TC.italic :: acc else acc
-              in
-                TC.reset :: s :: acc
-              end
+  let
+    fun traverse attr acc t =
+      case t of
+        Append {left, right, ...} =>
+          traverse attr (traverse attr acc left) right
+      | Attributes {attr = attr', child, ...} =>
+          traverse (mergeAttributes attr attr') acc child
+      | Empty => acc
+      | String s =>
+          if not colors then
+            s :: acc
+          else
+            let
+              val acc =
+                case #foreground attr of
+                  NONE => acc
+                | SOME c => TC.foreground c :: acc
+              val acc =
+                case #background attr of
+                  NONE => acc
+                | SOME c => TC.background c :: acc
+              val acc = if #bold attr then TC.bold :: acc else acc
+              val acc = if #underline attr then TC.underline :: acc else acc
+              val acc = if #italic attr then TC.italic :: acc else acc
+            in
+              TC.reset :: s :: acc
+            end
 
-    in
-      String.concat (List.rev (traverse default [] t))
-    end
+  in
+    String.concat (List.rev (traverse default [] t))
+  end
 
   fun debugShow t =
     case t of
@@ -324,17 +324,17 @@ struct
   datatype out = stdout | stderr
 
   fun print_ out t =
-    let
-      val (printer, filedesc) =
-        case out of
-          stdout => (print, Posix.FileSys.stdout)
-        | _ => (fn x => TextIO.output (TextIO.stdErr, x), Posix.FileSys.stderr)
+  let
+    val (printer, filedesc) =
+      case out of
+        stdout => (print, Posix.FileSys.stdout)
+      | _ => (fn x => TextIO.output (TextIO.stdErr, x), Posix.FileSys.stderr)
 
-      val kind = OS.IO.kind (Posix.FileSys.fdToIOD filedesc)
-    in
-      if kind = OS.IO.Kind.tty then printer (toString {colors = true} t)
-      else printer (toString {colors = false} t)
-    end
+    val kind = OS.IO.kind (Posix.FileSys.fdToIOD filedesc)
+  in
+    if kind = OS.IO.Kind.tty then printer (toString {colors = true} t)
+    else printer (toString {colors = false} t)
+  end
 
   val print = print_ stdout
   val printErr = print_ stderr

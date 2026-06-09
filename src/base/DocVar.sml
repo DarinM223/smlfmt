@@ -17,9 +17,9 @@ struct
   val counter = ref 0
 
   fun new () =
-    let val result = DocVar {id = !counter}
-    in counter := !counter + 1; result
-    end
+  let val result = DocVar {id = !counter}
+  in counter := !counter + 1; result
+  end
 
   fun toString (DocVar {id}) =
     "[v" ^ Int.toString id ^ "]"

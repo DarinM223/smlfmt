@@ -116,24 +116,24 @@ struct
       eq (nth s i, nth t i))
 
   fun append (s, t) =
-    let
-      val (ns, nt) = (length s, length t)
-      fun ith i =
-        if i < ns then nth s i else nth t (i - ns)
-    in
-      tabulate ith (ns + nt)
-    end
+  let
+    val (ns, nt) = (length s, length t)
+    fun ith i =
+      if i < ns then nth s i else nth t (i - ns)
+  in
+    tabulate ith (ns + nt)
+  end
 
   fun append3 (a, b, c) =
-    let
-      val (na, nb, nc) = (length a, length b, length c)
-      fun ith i =
-        if i < na then nth a i
-        else if i < na + nb then nth b (i - na)
-        else nth c (i - na - nb)
-    in
-      tabulate ith (na + nb + nc)
-    end
+  let
+    val (na, nb, nc) = (length a, length b, length c)
+    fun ith i =
+      if i < na then nth a i
+      else if i < na + nb then nth b (i - na)
+      else nth c (i - na - nb)
+  in
+    tabulate ith (na + nb + nc)
+  end
 
   fun zip (s, t) =
     zipWith (fn xx => xx) (s, t)
@@ -142,13 +142,13 @@ struct
     tabulate (fn i => nth s (length s - 1 - i)) (length s)
 
   fun exists p s =
-    let
-      val n = length s
-      fun loop i =
-        i < n andalso (p (nth s i) orelse loop (i + 1))
-    in
-      loop 0
-    end
+  let
+    val n = length s
+    fun loop i =
+      i < n andalso (p (nth s i) orelse loop (i + 1))
+  in
+    loop 0
+  end
 
   fun filter p s =
     AS.full (SeqBasis.filter (0, length s) (nth s) (p o nth s))

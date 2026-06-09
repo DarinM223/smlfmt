@@ -72,14 +72,14 @@ struct
 
 
   fun separateWithSpaces (items: doc option list) : doc =
-    let
-      val items: doc list = List.mapPartial (fn x => x) items
-    in
-      case items of
-        [] => empty
-      | first :: rest =>
-          List.foldl (fn (next, prev) => prev ++ space ++ next) first rest
-    end
+  let
+    val items: doc list = List.mapPartial (fn x => x) items
+  in
+    case items of
+      [] => empty
+    | first :: rest =>
+        List.foldl (fn (next, prev) => prev ++ space ++ next) first rest
+  end
 
   fun rigidVertically (item: doc) (items: doc Seq.t) : doc =
     if Seq.length items = 0 then item else rigid (Seq.iterate op$$ item items)

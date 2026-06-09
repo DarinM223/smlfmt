@@ -50,12 +50,12 @@ struct
 
 
   fun highlightToken tok =
-    let
-      val thisSrc = Token.getSource tok
-      val class = Token.getClass tok
-    in
-      tokColor class (TCS.fromString (Source.toString thisSrc))
-    end
+  let
+    val thisSrc = Token.getSource tok
+    val class = Token.getClass tok
+  in
+    tokColor class (TCS.fromString (Source.toString thisSrc))
+  end
 
 
   fun loop tokColor acc (wholeSrc, i, stop) (toks, j) =
@@ -93,69 +93,69 @@ struct
 
 
   fun highlight allows source =
-    let
-      val toks = Lexer.tokens allows source
-      val startOffset = Source.absoluteStartOffset source
-      val endOffset = Source.absoluteEndOffset source
-      val wholeSrc = Source.wholeFile source
-    in
-      loop tokColor TCS.empty (wholeSrc, startOffset, endOffset) (toks, 0)
-    end
+  let
+    val toks = Lexer.tokens allows source
+    val startOffset = Source.absoluteStartOffset source
+    val endOffset = Source.absoluteEndOffset source
+    val wholeSrc = Source.wholeFile source
+  in
+    loop tokColor TCS.empty (wholeSrc, startOffset, endOffset) (toks, 0)
+  end
 
 
   fun fuzzyTokens src =
-    let
-      val smlLexerAllows = AstAllows.make
-        { topExp = true
-        , optBar = true
-        , recordPun = true
-        , orPat = true
-        , extendedText = true
-        , sigWithtype = true
-        }
+  let
+    val smlLexerAllows = AstAllows.make
+      { topExp = true
+      , optBar = true
+      , recordPun = true
+      , orPat = true
+      , extendedText = true
+      , sigWithtype = true
+      }
 
-      val startOffset = Source.absoluteStartOffset src
-      val endOffset = Source.absoluteEndOffset src
-      val src = Source.wholeFile src
+    val startOffset = Source.absoluteStartOffset src
+    val endOffset = Source.absoluteEndOffset src
+    val src = Source.wholeFile src
 
-      fun tokEndOffset tok =
-        Source.absoluteEndOffset (Token.Pretoken.getSource tok)
+    fun tokEndOffset tok =
+      Source.absoluteEndOffset (Token.Pretoken.getSource tok)
 
-      fun finish acc =
-        Token.makeGroup (Seq.fromRevList acc)
+    fun finish acc =
+      Token.makeGroup (Seq.fromRevList acc)
 
-      fun loop acc offset =
-        if offset >= endOffset then
-          finish acc
-        else
-          ((case Lexer.next smlLexerAllows (Source.drop src offset) of
-              NONE => finish acc
-            | SOME tok => loop (tok :: acc) (tokEndOffset tok))
-           handle _ => loop acc (offset + 1))
+    fun loop acc offset =
+      if offset >= endOffset then
+        finish acc
+      else
+        ((case Lexer.next smlLexerAllows (Source.drop src offset) of
+            NONE => finish acc
+          | SOME tok => loop (tok :: acc) (tokEndOffset tok))
+         handle _ => loop acc (offset + 1))
 
-      val result = loop [] startOffset
-    (*
-          val _ = print ("fuzzyTokens\n")
-          val _ = print (Source.toString originalSrc ^ "\n")
-          val _ =
-            print ("Tokens: " ^ Seq.toString Token.toString result ^ "\n")
-    *)
-    in
-      result
-    end
+    val result = loop [] startOffset
+  (*
+        val _ = print ("fuzzyTokens\n")
+        val _ = print (Source.toString originalSrc ^ "\n")
+        val _ =
+          print ("Tokens: " ^ Seq.toString Token.toString result ^ "\n")
+  *)
+  in
+    result
+  end
 
 
   fun fuzzyHighlight source =
-    let
-      val toks = fuzzyTokens source
-      val startOffset = Source.absoluteStartOffset source
-      val endOffset = Source.absoluteEndOffset source
-      val wholeSrc = Source.wholeFile source
-      val result =
-        loop tokColor TCS.empty (wholeSrc, startOffset, endOffset) (toks, 0)
-    in
-      (* print (TCS.debugShow result ^ "\n"); *)
-      result
-    end
+  let
+    val toks = fuzzyTokens source
+    val startOffset = Source.absoluteStartOffset source
+    val endOffset = Source.absoluteEndOffset source
+    val wholeSrc = Source.wholeFile source
+    val result =
+      loop tokColor TCS.empty (wholeSrc, startOffset, endOffset) (toks, 0)
+  in
+    (* print (TCS.debugShow result ^ "\n"); *)
+    result
+  end
 
 end

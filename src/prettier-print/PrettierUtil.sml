@@ -122,13 +122,13 @@ struct
 
 
   fun showThingSimilarToLetInEnd tab {lett, isEmpty1, doc1, inn, doc2, endd} =
-    let in
-      at tab (token lett)
-      ++
-      (if isEmpty1 andalso not (Token.hasCommentsAfter lett) then token inn
-       else if isEmpty1 then at tab (token inn)
-       else doc1 ++ at tab (token inn)) ++ doc2 ++ at tab (token endd)
-    end
+  let in
+    at tab (token lett)
+    ++
+    (if isEmpty1 andalso not (Token.hasCommentsAfter lett) then token inn
+     else if isEmpty1 then at tab (token inn)
+     else doc1 ++ at tab (token inn)) ++ doc2 ++ at tab (token endd)
+  end
 
 
   fun showMaybeOpToken oppo tok =
@@ -146,33 +146,33 @@ struct
 
 
   fun expStartsWithStar exp =
-    let
-      open Ast.Exp
-    in
-      case exp of
-        Ident {opp = NONE, id} => Token.isStar (MaybeLongToken.getToken id)
-      | App {left, ...} => expStartsWithStar left
-      | Infix {left, ...} => expStartsWithStar left
-      | Typed {exp, ...} => expStartsWithStar exp
-      | Andalso {left, ...} => expStartsWithStar left
-      | Orelse {left, ...} => expStartsWithStar left
-      | Handle {exp, ...} => expStartsWithStar exp
-      | _ => false
-    end
+  let
+    open Ast.Exp
+  in
+    case exp of
+      Ident {opp = NONE, id} => Token.isStar (MaybeLongToken.getToken id)
+    | App {left, ...} => expStartsWithStar left
+    | Infix {left, ...} => expStartsWithStar left
+    | Typed {exp, ...} => expStartsWithStar exp
+    | Andalso {left, ...} => expStartsWithStar left
+    | Orelse {left, ...} => expStartsWithStar left
+    | Handle {exp, ...} => expStartsWithStar exp
+    | _ => false
+  end
 
 
   fun patStartsWithStar pat =
-    let
-      open Ast.Pat
-    in
-      case pat of
-        Ident {opp = NONE, id} => Token.isStar (MaybeLongToken.getToken id)
-      | Infix {left, ...} => patStartsWithStar left
-      | Typed {pat, ...} => patStartsWithStar pat
-      | Con {opp = NONE, id, ...} => Token.isStar (MaybeLongToken.getToken id)
-      | Layered {opp = NONE, id, ...} => Token.isStar id
-      | _ => false
-    end
+  let
+    open Ast.Pat
+  in
+    case pat of
+      Ident {opp = NONE, id} => Token.isStar (MaybeLongToken.getToken id)
+    | Infix {left, ...} => patStartsWithStar left
+    | Typed {pat, ...} => patStartsWithStar pat
+    | Con {opp = NONE, id, ...} => Token.isStar (MaybeLongToken.getToken id)
+    | Layered {opp = NONE, id, ...} => Token.isStar id
+    | _ => false
+  end
 
 
 end

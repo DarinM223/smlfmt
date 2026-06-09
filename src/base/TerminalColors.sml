@@ -39,28 +39,28 @@ struct
   val blue = {red = 0.0, green = 0.0, blue = 1.0}
 
   fun hsv {h, s, v} =
-    let
-      val H = h
-      val S = s
-      val V = v
+  let
+    val H = h
+    val S = s
+    val V = v
 
-      (* from https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB *)
-      val C = V * S
-      val H' = H / 60.0
-      val X = C * (1.0 - Real.abs (Real.rem (H', 2.0) - 1.0))
+    (* from https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB *)
+    val C = V * S
+    val H' = H / 60.0
+    val X = C * (1.0 - Real.abs (Real.rem (H', 2.0) - 1.0))
 
-      val (R1, G1, B1) =
-        if H' < 1.0 then (C, X, 0.0)
-        else if H' < 2.0 then (X, C, 0.0)
-        else if H' < 3.0 then (0.0, C, X)
-        else if H' < 4.0 then (0.0, X, C)
-        else if H' < 5.0 then (X, 0.0, C)
-        else (C, 0.0, X)
+    val (R1, G1, B1) =
+      if H' < 1.0 then (C, X, 0.0)
+      else if H' < 2.0 then (X, C, 0.0)
+      else if H' < 3.0 then (0.0, C, X)
+      else if H' < 4.0 then (0.0, X, C)
+      else if H' < 5.0 then (X, 0.0, C)
+      else (C, 0.0, X)
 
-      val m = V - C
-    in
-      {red = R1 + m, green = G1 + m, blue = B1 + m}
-    end
+    val m = V - C
+  in
+    {red = R1 + m, green = G1 + m, blue = B1 + m}
+  end
 
   fun to256 channel =
     Real.ceil (channel * 255.0)

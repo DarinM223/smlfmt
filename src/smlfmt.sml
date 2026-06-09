@@ -203,35 +203,34 @@ val pathmap =
 val skipPaths = Seq.fromList (List.map FilePath.fromUnixPath skipPathsArgs)
 
 fun handleLexOrParseError exn =
-  let
-    val e =
-      case exn of
-        Error.Error e => e
-      | other => raise other
-    val hist = ExnHistory.history exn
-  in
-    TCS.print
-      (Error.show {highlighter = SOME SyntaxHighlighter.fuzzyHighlight} e);
-    if List.null hist then ()
-    else print ("\n" ^ String.concat (List.map (fn ln => ln ^ "\n") hist));
-    OS.Process.exit OS.Process.failure
-  end
+let
+  val e =
+    case exn of
+      Error.Error e => e
+    | other => raise other
+  val hist = ExnHistory.history exn
+in
+  TCS.print (Error.show {highlighter = SOME SyntaxHighlighter.fuzzyHighlight} e);
+  if List.null hist then ()
+  else print ("\n" ^ String.concat (List.map (fn ln => ln ^ "\n") hist));
+  OS.Process.exit OS.Process.failure
+end
 
 
 fun exnToString exn =
-  let
-    val header = "UNHANDLED EXCEPTION: " ^ exnMessage exn
-    val stackTrace =
-      if List.null (ExnHistory.history exn) then
-        ""
-      else
-        "\nSTACK TRACE:\n"
-        ^
-        List.foldl op^ ""
-          (List.map (fn s => "  " ^ s ^ "\n") (ExnHistory.history exn))
-  in
-    header ^ stackTrace
-  end
+let
+  val header = "UNHANDLED EXCEPTION: " ^ exnMessage exn
+  val stackTrace =
+    if List.null (ExnHistory.history exn) then
+      ""
+    else
+      "\nSTACK TRACE:\n"
+      ^
+      List.foldl op^ ""
+        (List.map (fn s => "  " ^ s ^ "\n") (ExnHistory.history exn))
+in
+  header ^ stackTrace
+end
 
 fun mkSMLPrettied parserOutput =
   case parserOutput of
@@ -266,48 +265,47 @@ fun formatOneSML
     val result = TCS.toString {colors = false} prettied
 
     fun check () =
-      let
-        val result = CheckOutput.check
-          { origLexerOutput = lexerOutput
-          , origParserOutput = parserOutput
-          , origFormattedOutput = result
-          , formatter = TCS.toString {colors = false} o mkSMLPrettied
-          , allows = allows
-          , infdict = infdict
-          , tabWidth = tabWidth
-          }
-      in
-        case result of
-          CheckOutput.AllGood => print ("check " ^ hfp ^ ": success\n")
+    let
+      val result = CheckOutput.check
+        { origLexerOutput = lexerOutput
+        , origParserOutput = parserOutput
+        , origFormattedOutput = result
+        , formatter = TCS.toString {colors = false} o mkSMLPrettied
+        , allows = allows
+        , infdict = infdict
+        , tabWidth = tabWidth
+        }
+    in
+      case result of
+        CheckOutput.AllGood => print ("check " ^ hfp ^ ": success\n")
 
-        | CheckOutput.NonIdempotentFormatting =>
-            warnWithMessage
-              ("WARNING: " ^ hfp
-               ^
-               ": non-idempotent formatting detected. Don't worry! The output \
-               \is still correct; this is only an aesthetic issue. To help \
-               \improve `smlfmt`, please consider submitting a bug report: \
-               \https://github.com/shwestrick/smlfmt/issues")
+      | CheckOutput.NonIdempotentFormatting =>
+          warnWithMessage
+            ("WARNING: " ^ hfp
+             ^
+             ": non-idempotent formatting detected. Don't worry! The output \
+             \is still correct; this is only an aesthetic issue. To help \
+             \improve `smlfmt`, please consider submitting a bug report: \
+             \https://github.com/shwestrick/smlfmt/issues")
 
-        | CheckOutput.Error {description} =>
-            failWithMessage
-              ("ERROR: " ^ hfp ^ ": --safety-check failed: " ^ description
-               ^ ". "
-               ^
-               "Output aborted. This is a bug! Please consider submitting \
-               \a bug report: \
-               \https://github.com/shwestrick/smlfmt/issues")
-      end
+      | CheckOutput.Error {description} =>
+          failWithMessage
+            ("ERROR: " ^ hfp ^ ": --safety-check failed: " ^ description ^ ". "
+             ^
+             "Output aborted. This is a bug! Please consider submitting \
+             \a bug report: \
+             \https://github.com/shwestrick/smlfmt/issues")
+    end
 
     fun writeOut () =
-      let
-        val outstream = TextIO.openOut hfp
-      in
-        printErr ("formatting " ^ hfp ^ "\n");
-        TextIO.output (outstream, result);
-        TextIO.output (outstream, "\n");
-        TextIO.closeOut outstream
-      end
+    let
+      val outstream = TextIO.openOut hfp
+    in
+      printErr ("formatting " ^ hfp ^ "\n");
+      TextIO.output (outstream, result);
+      TextIO.output (outstream, "\n");
+      TextIO.closeOut outstream
+    end
 
     fun confirm () =
       if doReadOnly then
@@ -322,15 +320,15 @@ fun formatOneSML
         )
 
     fun checkIfFormatted () =
-      let
-        val original = ReadFile.contents hfp
-        val isFormatted = String.compare (original, result ^ "\n")
-      in
-        case isFormatted of
-          EQUAL => (TCS.print (boldc Palette.green "PASS "); print (hfp ^ "\n"))
-        | _ => failWithMessage ("ERROR: Unformatted file '" ^ hfp ^ "'");
-        ()
-      end
+    let
+      val original = ReadFile.contents hfp
+      val isFormatted = String.compare (original, result ^ "\n")
+    in
+      case isFormatted of
+        EQUAL => (TCS.print (boldc Palette.green "PASS "); print (hfp ^ "\n"))
+      | _ => failWithMessage ("ERROR: Unformatted file '" ^ hfp ^ "'");
+      ()
+    end
   in
     if doCheck then checkIfFormatted () else ();
 
@@ -355,58 +353,57 @@ fun formatOneSML
 
 
 fun doSML filepath =
-  let
-    val fp = FilePath.fromUnixPath filepath
+let
+  val fp = FilePath.fromUnixPath filepath
 
-    val (source, tm) = Util.getTime (fn _ => Source.loadFromFile fp)
-    val _ = dbgprintln ("load source: " ^ Time.fmt 3 tm ^ "s")
+  val (source, tm) = Util.getTime (fn _ => Source.loadFromFile fp)
+  val _ = dbgprintln ("load source: " ^ Time.fmt 3 tm ^ "s")
 
-    val (allTokens, tm) = Util.getTime (fn _ =>
-      Lexer.tokens allows source
-      handle exn => handleLexOrParseError exn)
-    val _ = dbgprintln ("lex: " ^ Time.fmt 3 tm ^ "s")
+  val (allTokens, tm) = Util.getTime (fn _ =>
+    Lexer.tokens allows source
+    handle exn => handleLexOrParseError exn)
+  val _ = dbgprintln ("lex: " ^ Time.fmt 3 tm ^ "s")
 
-    val (result, tm) = Util.getTime (fn _ =>
-      Parser.parse allows allTokens
-      handle exn => handleLexOrParseError exn)
-    val _ = dbgprintln ("parse: " ^ Time.fmt 3 tm ^ "s")
-  in
-    formatOneSML
-      { path = fp
-      , allows = allows
-      , infdict = NONE
-      , lexerOutput = allTokens
-      , parserOutput = result
-      }
-  end
+  val (result, tm) = Util.getTime (fn _ =>
+    Parser.parse allows allTokens
+    handle exn => handleLexOrParseError exn)
+  val _ = dbgprintln ("parse: " ^ Time.fmt 3 tm ^ "s")
+in
+  formatOneSML
+    { path = fp
+    , allows = allows
+    , infdict = NONE
+    , lexerOutput = allTokens
+    , parserOutput = result
+    }
+end
 
 
 fun doMLB filepath =
-  let
-    val fp = FilePath.fromUnixPath filepath
-    val results =
-      ParseAllSMLFromMLB.parse
-        { skipBasis = true
-        , additionalSkipPaths = skipPaths
-        , pathmap = pathmap
+let
+  val fp = FilePath.fromUnixPath filepath
+  val results =
+    ParseAllSMLFromMLB.parse
+      { skipBasis = true
+      , additionalSkipPaths = skipPaths
+      , pathmap = pathmap
+      , allows = allows
+      } fp
+    handle exn => handleLexOrParseError exn
+in
+  Util.for (0, Seq.length results) (fn i =>
+    let
+      val {path, allows, infdict, lexerOutput, parserOutput} = Seq.nth results i
+    in
+      formatOneSML
+        { path = path
         , allows = allows
-        } fp
-      handle exn => handleLexOrParseError exn
-  in
-    Util.for (0, Seq.length results) (fn i =>
-      let
-        val {path, allows, infdict, lexerOutput, parserOutput} =
-          Seq.nth results i
-      in
-        formatOneSML
-          { path = path
-          , allows = allows
-          , infdict = SOME infdict
-          , lexerOutput = lexerOutput
-          , parserOutput = parserOutput
-          }
-      end)
-  end
+        , infdict = SOME infdict
+        , lexerOutput = lexerOutput
+        , parserOutput = parserOutput
+        }
+    end)
+end
 
 
 datatype fileinfo =

@@ -273,91 +273,91 @@ struct
     WithSource.srcOf (Seq.nth context idx)
 
   fun lineDifference (tok1, tok2) =
-    let
-      val src1 = getSource tok1
-      val src2 = getSource tok2
-      val {line = end1, ...} = Source.absoluteEnd (getSource tok1)
-      val {line = start2, ...} = Source.absoluteStart (getSource tok2)
-    in
-      if FilePath.sameFile (Source.fileName src1, Source.fileName src2) then
-        start2 - end1
-      else
-        raise Fail "Bug! lineDifference on tokens from different files"
-    end
+  let
+    val src1 = getSource tok1
+    val src2 = getSource tok2
+    val {line = end1, ...} = Source.absoluteEnd (getSource tok1)
+    val {line = start2, ...} = Source.absoluteStart (getSource tok2)
+  in
+    if FilePath.sameFile (Source.fileName src1, Source.fileName src2) then
+      start2 - end1
+    else
+      raise Fail "Bug! lineDifference on tokens from different files"
+  end
 
   fun spansMultipleLines tok =
-    let
-      val {line = lnStart, ...} = Source.absoluteStart (getSource tok)
-      val {line = lnEnd, ...} = Source.absoluteEnd (getSource tok)
-    in
-      lnEnd <> lnStart
-    end
+  let
+    val {line = lnStart, ...} = Source.absoluteStart (getSource tok)
+    val {line = lnEnd, ...} = Source.absoluteEnd (getSource tok)
+  in
+    lnEnd <> lnStart
+  end
 
   fun toString tok =
-    let val src = getSource tok
-    in CharVector.tabulate (Source.length src, Source.nth src)
-    end
+  let val src = getSource tok
+  in CharVector.tabulate (Source.length src, Source.nth src)
+  end
 
   fun tryReserved src =
-    let
-      val str = CharVector.tabulate (Source.length src, Source.nth src)
-      fun r rclass = SOME rclass
-    in
-      case str of
-      (** Symbolic *)
-        ":" => r Colon
-      | ":>" => r ColonArrow
-      | "|" => r Bar
-      | "=" => r Equal
-      | "=>" => r FatArrow
-      | "->" => r Arrow
-      | "#" => r Hash
-      (** Core *)
-      | "abstype" => r Abstype
-      | "and" => r And
-      | "andalso" => r Andalso
-      | "as" => r As
-      | "case" => r Case
-      | "datatype" => r Datatype
-      | "do" => r Do
-      | "else" => r Else
-      | "end" => r End
-      | "exception" => r Exception
-      | "fn" => r Fn
-      | "fun" => r Fun
-      | "handle" => r Handle
-      | "if" => r If
-      | "in" => r In
-      | "infix" => r Infix
-      | "infixr" => r Infixr
-      | "let" => r Let
-      | "local" => r Local
-      | "nonfix" => r Nonfix
-      | "of" => r Of
-      | "op" => r Op
-      | "open" => r Open
-      | "orelse" => r Orelse
-      | "raise" => r Raise
-      | "rec" => r Rec
-      | "then" => r Then
-      | "type" => r Type
-      | "val" => r Val
-      | "with" => r With
-      | "withtype" => r Withtype
-      | "while" => r While
-      (** Modules *)
-      | "eqtype" => r Eqtype
-      | "functor" => r Functor
-      | "include" => r Include
-      | "sharing" => r Sharing
-      | "sig" => r Sig
-      | "signature" => r Signature
-      | "struct" => r Struct
-      | "structure" => r Structure
-      | "where" => r Where
+  let
+    val str = CharVector.tabulate (Source.length src, Source.nth src)
+    fun r rclass = SOME rclass
+  in
+    case str of
+    (** Symbolic *)
+      ":" => r Colon
+    | ":>" => r ColonArrow
+    | "|" => r Bar
+    | "=" => r Equal
+    | "=>" => r FatArrow
+    | "->" => r Arrow
+    | "#" => r Hash
+    (** Core *)
+    | "abstype" => r Abstype
+    | "and" => r And
+    | "andalso" => r Andalso
+    | "as" => r As
+    | "case" => r Case
+    | "datatype" => r Datatype
+    | "do" => r Do
+    | "else" => r Else
+    | "end" => r End
+    | "exception" => r Exception
+    | "fn" => r Fn
+    | "fun" => r Fun
+    | "handle" => r Handle
+    | "if" => r If
+    | "in" => r In
+    | "infix" => r Infix
+    | "infixr" => r Infixr
+    | "let" => r Let
+    | "local" => r Local
+    | "nonfix" => r Nonfix
+    | "of" => r Of
+    | "op" => r Op
+    | "open" => r Open
+    | "orelse" => r Orelse
+    | "raise" => r Raise
+    | "rec" => r Rec
+    | "then" => r Then
+    | "type" => r Type
+    | "val" => r Val
+    | "with" => r With
+    | "withtype" => r Withtype
+    | "while" => r While
+    (** Modules *)
+    | "eqtype" => r Eqtype
+    | "functor" => r Functor
+    | "include" => r Include
+    | "sharing" => r Sharing
+    | "sig" => r Sig
+    | "signature" => r Signature
+    | "struct" => r Struct
+    | "structure" => r Structure
+    | "where" => r Where
 
-      | _ => NONE (* (print ("not reserved: " ^ other ^ "\n"); NONE) *)
-    end
+    | _ => NONE (* (print ("not reserved: " ^ other ^ "\n"); NONE) *)
+  end
 
   fun reservedToString rc =
     case rc of
@@ -467,9 +467,9 @@ struct
     | _ => false
 
   fun isStar tok =
-    let val src = getSource tok
-    in Source.length src = 1 andalso Source.nth src 0 = #"*"
-    end
+  let val src = getSource tok
+  in Source.length src = 1 andalso Source.nth src 0 = #"*"
+  end
 
   fun isOpenParen tok =
     case getClass tok of
@@ -511,31 +511,31 @@ struct
     | _ => false
 
   fun isSymbolicIdentifier tok =
-    let
-      val src = getSource tok
-      val isSymb = LexUtils.isSymbolic (Source.nth src (Source.length src - 1))
-    in
-      case getClass tok of
-        Identifier => isSymb
-      | LongIdentifier => isSymb
-      | Reserved Equal => true (* annoying edge case *)
-      | _ => false
-    end
+  let
+    val src = getSource tok
+    val isSymb = LexUtils.isSymbolic (Source.nth src (Source.length src - 1))
+  in
+    case getClass tok of
+      Identifier => isSymb
+    | LongIdentifier => isSymb
+    | Reserved Equal => true (* annoying edge case *)
+    | _ => false
+  end
 
   (** alphanumeric, not starting with prime *)
   fun isStrIdentifier tok =
-    let
-      val src = getSource tok
-    in
-      case getClass tok of
-        Identifier =>
-          Source.nth src 0 <> #"'"
-          andalso
-          Util.all (0, Source.length src) (fn i =>
-            LexUtils.isAlphaNumPrimeOrUnderscore (Source.nth src i))
+  let
+    val src = getSource tok
+  in
+    case getClass tok of
+      Identifier =>
+        Source.nth src 0 <> #"'"
+        andalso
+        Util.all (0, Source.length src) (fn i =>
+          LexUtils.isAlphaNumPrimeOrUnderscore (Source.nth src i))
 
-      | _ => false
-    end
+    | _ => false
+  end
 
   fun isMaybeLongStrIdentifier tok =
     isStrIdentifier tok orelse isLongIdentifier tok
@@ -578,15 +578,15 @@ struct
     | _ => false
 
   fun isHexIntegerConstant tok =
-    let
-      val src = getSource tok
-    in
-      case getClass tok of
-        IntegerConstant =>
-          Source.length src > 2 andalso Source.nth src 0 = #"0"
-          andalso Source.nth src 1 = #"x"
-      | _ => false
-    end
+  let
+    val src = getSource tok
+  in
+    case getClass tok of
+      IntegerConstant =>
+        Source.length src > 2 andalso Source.nth src 0 = #"0"
+        andalso Source.nth src 1 = #"x"
+    | _ => false
+  end
 
   fun isDecimalIntegerConstant tok =
     case getClass tok of
@@ -664,60 +664,60 @@ struct
     * counting tab-widths appropriately.
     *)
   fun effectiveOffset {tabWidth: int} tok =
-    let
-      val src = getSource tok
-      val {col, line = lineNum} = Source.absoluteStart src
-      val len = col - 1
-      val charsBeforeOnSameLine = Source.take (Source.wholeLine src lineNum) len
-      fun loop effOff i =
-        if i >= len then
-          effOff
-        else if #"\t" = Source.nth charsBeforeOnSameLine i then
-          (* advance up to next tabstop *)
-          loop (effOff + tabWidth - effOff mod tabWidth) (i + 1)
-        else
-          loop (effOff + 1) (i + 1)
-    in
-      loop 0 0
-    end
+  let
+    val src = getSource tok
+    val {col, line = lineNum} = Source.absoluteStart src
+    val len = col - 1
+    val charsBeforeOnSameLine = Source.take (Source.wholeLine src lineNum) len
+    fun loop effOff i =
+      if i >= len then
+        effOff
+      else if #"\t" = Source.nth charsBeforeOnSameLine i then
+        (* advance up to next tabstop *)
+        loop (effOff + tabWidth - effOff mod tabWidth) (i + 1)
+      else
+        loop (effOff + 1) (i + 1)
+  in
+    loop 0 0
+  end
 
 
   (** Check that the text of t1 exactly matches the text of t2. Useful for
     * comparing identifier names, e.g. for infix lookup.
     *)
   fun same (t1, t2) =
-    let
-      val s1 = getSource t1
-      val s2 = getSource t2
-      val n = Source.length s1
+  let
+    val s1 = getSource t1
+    val s2 = getSource t2
+    val n = Source.length s1
 
-      fun loop i =
-        if i >= n then true
-        else (Source.nth s1 i = Source.nth s2 i) andalso loop (i + 1)
-    in
-      n = Source.length s2 andalso loop 0
-    end
+    fun loop i =
+      if i >= n then true
+      else (Source.nth s1 i = Source.nth s2 i) andalso loop (i + 1)
+  in
+    n = Source.length s2 andalso loop 0
+  end
 
 
   fun piecesAsStrings {tabWidth} tok =
+  let
+    val effectiveOffset = effectiveOffset {tabWidth = tabWidth} tok
+
+    fun strip line =
     let
-      val effectiveOffset = effectiveOffset {tabWidth = tabWidth} tok
-
-      fun strip line =
-        let
-          val {result, ...} =
-            StripEffectiveWhitespace.strip
-              {tabWidth = tabWidth, removeAtMost = effectiveOffset} line
-        in
-          result
-        end
-
-      val src = getSource tok
-      val asString = CharVector.tabulate (Source.length src, Source.nth src)
+      val {result, ...} =
+        StripEffectiveWhitespace.strip
+          {tabWidth = tabWidth, removeAtMost = effectiveOffset} line
     in
-      Seq.map (fn (i, j) => strip (String.substring (asString, i, j - i)))
-        (Source.lineRanges src)
+      result
     end
+
+    val src = getSource tok
+    val asString = CharVector.tabulate (Source.length src, Source.nth src)
+  in
+    Seq.map (fn (i, j) => strip (String.substring (asString, i, j - i)))
+      (Source.lineRanges src)
+  end
 
 
   (** Check that t1 and t2 have exactly the same text, similar to function
@@ -804,26 +804,24 @@ struct
         else SOME t'
 
   fun commentsOrWhitespaceBefore tok =
-    let
-      fun loop acc t =
-        case prevToken t of
-          SOME t' =>
-            if isCommentOrWhitespace t' then loop (t' :: acc) t' else acc
-        | NONE => acc
-    in
-      Seq.fromList (loop [] tok)
-    end
+  let
+    fun loop acc t =
+      case prevToken t of
+        SOME t' => if isCommentOrWhitespace t' then loop (t' :: acc) t' else acc
+      | NONE => acc
+  in
+    Seq.fromList (loop [] tok)
+  end
 
   fun commentsOrWhitespaceAfter tok =
-    let
-      fun loop acc t =
-        case nextToken t of
-          SOME t' =>
-            if isCommentOrWhitespace t' then loop (t' :: acc) t' else acc
-        | NONE => acc
-    in
-      Seq.fromRevList (loop [] tok)
-    end
+  let
+    fun loop acc t =
+      case nextToken t of
+        SOME t' => if isCommentOrWhitespace t' then loop (t' :: acc) t' else acc
+      | NONE => acc
+  in
+    Seq.fromRevList (loop [] tok)
+  end
 
 
   fun hasCommentsBefore t =
@@ -841,31 +839,31 @@ struct
 
 
   fun commentsBefore tok =
-    let
-      fun loop acc t =
-        case prevToken t of
-          SOME t' =>
-            if isWhitespace t' then loop acc t'
-            else if isComment t' then loop (t' :: acc) t'
-            else acc
-        | NONE => acc
-    in
-      Seq.fromList (loop [] tok)
-    end
+  let
+    fun loop acc t =
+      case prevToken t of
+        SOME t' =>
+          if isWhitespace t' then loop acc t'
+          else if isComment t' then loop (t' :: acc) t'
+          else acc
+      | NONE => acc
+  in
+    Seq.fromList (loop [] tok)
+  end
 
 
   fun commentsAfter tok =
-    let
-      fun loop acc t =
-        case nextToken t of
-          SOME t' =>
-            if isWhitespace t' then loop acc t'
-            else if isComment t' then loop (t' :: acc) t'
-            else acc
-        | NONE => acc
-    in
-      Seq.fromRevList (loop [] tok)
-    end
+  let
+    fun loop acc t =
+      case nextToken t of
+        SOME t' =>
+          if isWhitespace t' then loop acc t'
+          else if isComment t' then loop (t' :: acc) t'
+          else acc
+      | NONE => acc
+  in
+    Seq.fromRevList (loop [] tok)
+  end
 
 
   structure Pretoken =

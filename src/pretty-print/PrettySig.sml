@@ -93,24 +93,24 @@ struct
               ])
 
           fun show_datdesc (starter, {tyvars, tycon, eq, elems, delims, optbar}) =
-            let
-              val _ = if Option.isSome optbar then optBarFail () else ()
+          let
+            val _ = if Option.isSome optbar then optBarFail () else ()
 
-              val initial = group (separateWithSpaces
-                [ SOME (token starter)
-                , maybeShowSyntaxSeq tyvars token
-                , SOME (token tycon)
-                , SOME (token eq)
-                ])
-            in
-              group
-                (initial
-                 $$
-                 group
-                   (Seq.iterate op$$ (showCon (space, Seq.nth elems 0))
-                      (Seq.zipWith showCon
-                         (Seq.map token delims, Seq.drop elems 1))))
-            end
+            val initial = group (separateWithSpaces
+              [ SOME (token starter)
+              , maybeShowSyntaxSeq tyvars token
+              , SOME (token tycon)
+              , SOME (token eq)
+              ])
+          in
+            group
+              (initial
+               $$
+               group
+                 (Seq.iterate op$$ (showCon (space, Seq.nth elems 0))
+                    (Seq.zipWith showCon
+                       (Seq.map token delims, Seq.drop elems 1))))
+          end
         in
           rigidVertically (show_datdesc (datatypee, Seq.nth elems 0))
             (Seq.zipWith show_datdesc (delims, Seq.drop elems 1))
@@ -229,14 +229,14 @@ struct
 
 
   fun showSigDec (Ast.Sig.Signature {signaturee, elems, delims}) =
-    let
-      fun showOne (starter, {ident, eq, sigexp}) =
-        group
-          ((token starter ++ space ++ token ident ++ space ++ token eq)
-           $$ indent (showSigExp sigexp))
-    in
-      rigidVertically (showOne (signaturee, Seq.nth elems 0))
-        (Seq.zipWith showOne (delims, Seq.drop elems 1))
-    end
+  let
+    fun showOne (starter, {ident, eq, sigexp}) =
+      group
+        ((token starter ++ space ++ token ident ++ space ++ token eq)
+         $$ indent (showSigExp sigexp))
+  in
+    rigidVertically (showOne (signaturee, Seq.nth elems 0)) (Seq.zipWith showOne
+      (delims, Seq.drop elems 1))
+  end
 
 end

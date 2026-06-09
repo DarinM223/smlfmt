@@ -119,27 +119,27 @@ struct
     ]
 
   fun isBasDecStartToken tok =
-    let val c = getClass tok
-    in List.exists (fn c' => c' = c) basDecStartTokens
-    end
+  let val c = getClass tok
+  in List.exists (fn c' => c' = c) basDecStartTokens
+  end
 
 
   fun extensionOfPathInSource src =
-    let
-      fun findDot i =
-        if i = 0 then
-          NONE
-        else
-          case Source.nth src (i - 1) of
-            #"." => SOME (i - 1)
-          | #"/" => NONE
-          | _ => findDot (i - 1)
-    in
-      case findDot (Source.length src) of
-        NONE => NONE
-      | SOME i =>
-          SOME (Source.toString (Source.slice src (i, Source.length src - i)))
-    end
+  let
+    fun findDot i =
+      if i = 0 then
+        NONE
+      else
+        case Source.nth src (i - 1) of
+          #"." => SOME (i - 1)
+        | #"/" => NONE
+        | _ => findDot (i - 1)
+  in
+    case findDot (Source.length src) of
+      NONE => NONE
+    | SOME i =>
+        SOME (Source.toString (Source.slice src (i, Source.length src - i)))
+  end
 
 
   fun makePathFromSource src =

@@ -39,25 +39,25 @@ struct
     else
       let
         fun showOne {topdec, semicolon} =
-          let
-            val td =
-              case topdec of
-                Ast.StrDec d => showStrDec d
-              | Ast.SigDec d => showSigDec d
-              | Ast.FunDec d => showFunDec d
-              | Ast.TopExp _ =>
-                  raise Fail
-                    "unsupported: top-level expressions. Note: you are \
-                    \using `-engine pretty`, which is headed towards \
-                    \deprecation. Please use `-engine prettier` instead, \
-                    \which supports top-level expressions."
-            val sc =
-              case semicolon of
-                NONE => empty
-              | SOME sc => token sc
-          in
-            td ++ sc
-          end
+        let
+          val td =
+            case topdec of
+              Ast.StrDec d => showStrDec d
+            | Ast.SigDec d => showSigDec d
+            | Ast.FunDec d => showFunDec d
+            | Ast.TopExp _ =>
+                raise Fail
+                  "unsupported: top-level expressions. Note: you are \
+                  \using `-engine pretty`, which is headed towards \
+                  \deprecation. Please use `-engine prettier` instead, \
+                  \which supports top-level expressions."
+          val sc =
+            case semicolon of
+              NONE => empty
+            | SOME sc => token sc
+        in
+          td ++ sc
+        end
 
         val all = Seq.map showOne tds
       in
@@ -66,14 +66,14 @@ struct
 
 
   fun pretty {ribbonFrac, maxWidth, tabWidth, indent, debug} ast =
-    let
-      val doc = showAst ast
-      val doc = TokenDoc.insertComments doc
-      val doc = TokenDoc.insertBlankLines doc
-    in
-      StringDoc.pretty
-        {ribbonFrac = ribbonFrac, maxWidth = maxWidth, indentWidth = indent}
-        (toStringDoc {tabWidth = tabWidth} doc)
-    end
+  let
+    val doc = showAst ast
+    val doc = TokenDoc.insertComments doc
+    val doc = TokenDoc.insertBlankLines doc
+  in
+    StringDoc.pretty
+      {ribbonFrac = ribbonFrac, maxWidth = maxWidth, indentWidth = indent}
+      (toStringDoc {tabWidth = tabWidth} doc)
+  end
 
 end

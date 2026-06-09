@@ -152,31 +152,31 @@ struct
     (** All the names have to match. *)
     fun checkValidFValBind (fvalbind: exp fvalbind)
       (error: {what: string, pos: Source.t, explain: string option} -> unit) =
-      let
-        fun getName {fname_args, ty, eq, exp} =
-          case fname_args of
-            PrefixedFun {id, ...} => id
-          | InfixedFun {id, ...} => id
-          | CurriedInfixedFun {id, ...} => id
+    let
+      fun getName {fname_args, ty, eq, exp} =
+        case fname_args of
+          PrefixedFun {id, ...} => id
+        | InfixedFun {id, ...} => id
+        | CurriedInfixedFun {id, ...} => id
 
-        fun checkFunc {elems, delims, optbar} =
-          let
-            val fname = getName (Seq.nth elems 0)
-            fun checkName clause =
-              if Token.same (getName clause, fname) then
-                ()
-              else
-                error
-                  { pos = Token.getSource (getName clause)
-                  , what = "Function name does not match."
-                  , explain = NONE
-                  }
-          in
-            Seq.applyIdx (Seq.drop elems 1) (fn (_, elem) => checkName elem)
-          end
+      fun checkFunc {elems, delims, optbar} =
+      let
+        val fname = getName (Seq.nth elems 0)
+        fun checkName clause =
+          if Token.same (getName clause, fname) then
+            ()
+          else
+            error
+              { pos = Token.getSource (getName clause)
+              , what = "Function name does not match."
+              , explain = NONE
+              }
       in
-        Seq.applyIdx (#elems fvalbind) (fn (_, func) => checkFunc func)
+        Seq.applyIdx (Seq.drop elems 1) (fn (_, elem) => checkName elem)
       end
+    in
+      Seq.applyIdx (#elems fvalbind) (fn (_, func) => checkFunc func)
+    end
 
 
   end

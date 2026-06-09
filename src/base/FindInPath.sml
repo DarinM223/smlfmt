@@ -13,20 +13,20 @@ end =
 struct
 
   fun contents dir =
-    let
-      (** Loop through dirstream and accumulate list.
-        * No need to reverse the result since dirstream is arbitrary order.
-        *)
-      val dirstream = Posix.FileSys.opendir (FilePath.toHostPath dir)
-      fun loop acc =
-        case Posix.FileSys.readdir dirstream of
-          SOME s => loop (s :: acc)
-        | NONE => acc
-      val result = loop []
-    in
-      Posix.FileSys.closedir dirstream;
-      result
-    end
+  let
+    (** Loop through dirstream and accumulate list.
+      * No need to reverse the result since dirstream is arbitrary order.
+      *)
+    val dirstream = Posix.FileSys.opendir (FilePath.toHostPath dir)
+    fun loop acc =
+      case Posix.FileSys.readdir dirstream of
+        SOME s => loop (s :: acc)
+      | NONE => acc
+    val result = loop []
+  in
+    Posix.FileSys.closedir dirstream;
+    result
+  end
 
 
   fun isExecutable path =

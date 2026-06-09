@@ -80,15 +80,15 @@ struct
 
 
   fun getElems ann =
-    let
-      val src = MLBToken.getSource ann
+  let
+    val src = MLBToken.getSource ann
 
-      (* this strips the initial and final `"` characters from the string *)
-      val str = CharVector.tabulate (Source.length src - 2, fn i =>
-        Source.nth src (i + 1))
-    in
-      String.tokens Char.isSpace str
-    end
+    (* this strips the initial and final `"` characters from the string *)
+    val str = CharVector.tabulate (Source.length src - 2, fn i =>
+      Source.nth src (i + 1))
+  in
+    String.tokens Char.isSpace str
+  end
 
 
   fun applyGeneralAnn (allows, ann) =

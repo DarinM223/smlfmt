@@ -87,15 +87,15 @@ struct
             }
 
     fun combine (s1, s2) =
-      let
-        val S {indent = i1, rigid = r1, allowsComments = c1} = s1
-        val S {indent = i2, rigid = r2, allowsComments = c2} = s2
-      in
-        S { indent = combineIndentStyles (i1, i2)
-          , rigid = r1 orelse r2
-          , allowsComments = c1 orelse c2
-          }
-      end
+    let
+      val S {indent = i1, rigid = r1, allowsComments = c1} = s1
+      val S {indent = i2, rigid = r2, allowsComments = c2} = s2
+    in
+      S { indent = combineIndentStyles (i1, i2)
+        , rigid = r1 orelse r2
+        , allowsComments = c1 orelse c2
+        }
+    end
 
     val inplace = S {indent = Inplace, rigid = false, allowsComments = false}
     val indented = S
@@ -154,9 +154,9 @@ struct
   val tabCounter = ref 0
 
   fun new {parent, style} =
-    let val c = !tabCounter
-    in tabCounter := c + 1; Tab {id = c, style = style, parent = parent}
-    end
+  let val c = !tabCounter
+  in tabCounter := c + 1; Tab {id = c, style = style, parent = parent}
+  end
 
   val root = Root
 

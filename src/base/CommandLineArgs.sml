@@ -34,19 +34,19 @@ struct
     )
 
   fun positional () =
-    let
-      fun loop found rest =
-        case rest of
-          [] => List.rev found
-        | [x] =>
-            List.rev (if not (String.isPrefix "-" x) then x :: found else found)
-        | x :: y :: rest' =>
-            if not (String.isPrefix "-" x) then loop (x :: found) (y :: rest')
-            else if String.isPrefix "--" x then loop found (y :: rest')
-            else loop found rest'
-    in
-      loop [] (CommandLine.arguments ())
-    end
+  let
+    fun loop found rest =
+      case rest of
+        [] => List.rev found
+      | [x] =>
+          List.rev (if not (String.isPrefix "-" x) then x :: found else found)
+      | x :: y :: rest' =>
+          if not (String.isPrefix "-" x) then loop (x :: found) (y :: rest')
+          else if String.isPrefix "--" x then loop found (y :: rest')
+          else loop found rest'
+  in
+    loop [] (CommandLine.arguments ())
+  end
 
   fun search key args =
     case args of
@@ -60,15 +60,15 @@ struct
     | SOME (s :: _) => s
 
   fun parseStrings key =
-    let
-      fun loop args =
-        case search ("-" ^ key) args of
-          NONE => []
-        | SOME [] => die ("Missing argument of \"-" ^ key ^ "\"")
-        | SOME (v :: args') => v :: loop args'
-    in
-      loop (CommandLine.arguments ())
-    end
+  let
+    fun loop args =
+      case search ("-" ^ key) args of
+        NONE => []
+      | SOME [] => die ("Missing argument of \"-" ^ key ^ "\"")
+      | SOME (v :: args') => v :: loop args'
+  in
+    loop (CommandLine.arguments ())
+  end
 
   fun parseInt key default =
     case search ("-" ^ key) (CommandLine.arguments ()) of

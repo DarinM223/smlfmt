@@ -12,18 +12,18 @@ local
     val hues = Seq.fromList [0, 30, 55, 90, 140, 180, 210, 250, 290, 320]
 
     fun niceRed depth =
-      let
-        val s =
-          (compaction - 1.0 + (1.0 / (1.0 + (Real.fromInt depth / compaction))))
-          / compaction
-        val s = s * maxSat
+    let
+      val s =
+        (compaction - 1.0 + (1.0 / (1.0 + (Real.fromInt depth / compaction))))
+        / compaction
+      val s = s * maxSat
 
-        (* val d = if depth mod 2 = 0 then 2*(depth div 2)+1 else 2*(depth div 2) *)
-        val d = 3 * (depth - 1)
-        val h = Real.fromInt (Seq.nth hues (d mod Seq.length hues))
-      in
-        TerminalColors.hsv {h = h, s = s, v = 0.9}
-      end
+      (* val d = if depth mod 2 = 0 then 2*(depth div 2)+1 else 2*(depth div 2) *)
+      val d = 3 * (depth - 1)
+      val h = Real.fromInt (Seq.nth hues (d mod Seq.length hues))
+    in
+      TerminalColors.hsv {h = h, s = s, v = 0.9}
+    end
 
     fun emphasize depth s =
       backgroundIfNone (niceRed depth) s
@@ -61,15 +61,15 @@ local
      * rest belong to the next token. (tok, comments) must be adjacent.
      *)
     fun findSplit (tok, comments) =
-      let
-        val n = Seq.length comments
-        fun loop i =
-          if i >= n then n
-          else if Token.lineDifference (tok, Seq.nth comments i) > 0 then i
-          else loop (i + 1)
-      in
-        loop 0
-      end
+    let
+      val n = Seq.length comments
+      fun loop i =
+        if i >= n then n
+        else if Token.lineDifference (tok, Seq.nth comments i) > 0 then i
+        else loop (i + 1)
+    in
+      loop 0
+    end
 
     fun splitCommentsBefore tok =
       case Token.prevTokenNotCommentOrWhitespace tok of
@@ -83,19 +83,19 @@ local
           end
 
     fun splitCommentsAfterAndBeforeNext tok =
-      let
-        val cs = allCommentsAfter tok
-        val i = findSplit (tok, cs)
-        val cs1 = Seq.take cs i
-        val cs2 = Seq.drop cs i
-      in
-        (cs1, cs2)
-      end
+    let
+      val cs = allCommentsAfter tok
+      val i = findSplit (tok, cs)
+      val cs1 = Seq.take cs i
+      val cs2 = Seq.drop cs i
+    in
+      (cs1, cs2)
+    end
 
     fun splitCommentsAfter tok =
-      let val (cs, _) = splitCommentsAfterAndBeforeNext tok
-      in cs
-      end
+    let val (cs, _) = splitCommentsAfterAndBeforeNext tok
+    in cs
+    end
   end
 
   datatype pieces =
@@ -112,13 +112,13 @@ local
         val effectiveOffset = Token.effectiveOffset {tabWidth = tabWidth} tok
 
         fun strip line =
-          let
-            val (_, ln) =
-              TCS.stripEffectiveWhitespace
-                {tabWidth = tabWidth, removeAtMost = effectiveOffset} line
-          in
-            ln
-          end
+        let
+          val (_, ln) =
+            TCS.stripEffectiveWhitespace
+              {tabWidth = tabWidth, removeAtMost = effectiveOffset} line
+        in
+          ln
+        end
 
         val t = SyntaxHighlighter.highlightToken tok
 

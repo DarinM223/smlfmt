@@ -19,33 +19,33 @@ struct
   (* ====================================================================== *)
 
   fun leftMostSigExp e =
-    let
-      open Ast.Sig
-    in
-      case e of
-        WhereType {sigexp, ...} => leftMostSigExp sigexp
-      | _ => e
-    end
+  let
+    open Ast.Sig
+  in
+    case e of
+      WhereType {sigexp, ...} => leftMostSigExp sigexp
+    | _ => e
+  end
 
 
   fun specIsEmpty spec =
-    let
-      open Ast.Sig
-    in
-      case spec of
-        EmptySpec => true
-      | _ => false
-    end
+  let
+    open Ast.Sig
+  in
+    case spec of
+      EmptySpec => true
+    | _ => false
+  end
 
 
   fun sigExpWantsSameTabAsDec e =
-    let
-      open Ast.Sig
-    in
-      case leftMostSigExp e of
-        Ident _ => false
-      | Spec {spec, ...} => not (specIsEmpty spec)
-      | _ => true
-    end
+  let
+    open Ast.Sig
+  in
+    case leftMostSigExp e of
+      Ident _ => false
+    | Spec {spec, ...} => not (specIsEmpty spec)
+    | _ => true
+  end
 
 end

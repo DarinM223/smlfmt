@@ -65,27 +65,27 @@ struct
     | name :: _ => [name]
 
   fun normalize (fields: filepath) =
-    let
-      fun addParent (".", fields) = fields
-        | addParent ("..", fields) = ".." :: fields
-        | addParent (_, ".." :: fields) = fields
-        | addParent (parent, fields) = parent :: fields
-    in
-      List.rev (List.foldl addParent (basename fields) (dirname fields))
-    end
+  let
+    fun addParent (".", fields) = fields
+      | addParent ("..", fields) = ".." :: fields
+      | addParent (_, ".." :: fields) = fields
+      | addParent (parent, fields) = parent :: fields
+  in
+    List.rev (List.foldl addParent (basename fields) (dirname fields))
+  end
 
   fun sameFile (fp1, fp2) =
     Util.equalLists op= (normalize fp1, normalize fp2)
 
   fun isPrefix (a, b) =
-    let
-      fun loop ([], _) = true
-        | loop (_, []) = false
-        | loop (x :: xs, y :: ys) =
-            x = y andalso loop (xs, ys)
-    in
-      loop (List.rev a, List.rev b)
-    end
+  let
+    fun loop ([], _) = true
+      | loop (_, []) = false
+      | loop (x :: xs, y :: ys) =
+          x = y andalso loop (xs, ys)
+  in
+    loop (List.rev a, List.rev b)
+  end
 
   fun join (fields1, fields2) = fields2 @ fields1
 

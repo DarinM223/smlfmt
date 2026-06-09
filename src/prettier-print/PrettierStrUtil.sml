@@ -25,46 +25,46 @@ struct
   (* ====================================================================== *)
 
   fun leftMostStrExp strexp =
-    let
-      open Ast.Str
-    in
-      case strexp of
-        Constraint {strexp, ...} => leftMostStrExp strexp
-      | _ => strexp
-    end
+  let
+    open Ast.Str
+  in
+    case strexp of
+      Constraint {strexp, ...} => leftMostStrExp strexp
+    | _ => strexp
+  end
 
 
   fun strExpWantsSameTabAsDec e =
-    let
-      open Ast.Str
-    in
-      case leftMostStrExp e of
-        Struct _ => true
-      | LetInEnd _ => true
-      | _ => false
-    end
+  let
+    open Ast.Str
+  in
+    case leftMostStrExp e of
+      Struct _ => true
+    | LetInEnd _ => true
+    | _ => false
+  end
 
 
   fun strExpInsideFunAppWantsSpaceBefore e =
-    let
-      open Ast.Str
-    in
-      case leftMostStrExp e of
-        Struct _ => true
-      | LetInEnd _ => true
-      | _ => false
-    end
+  let
+    open Ast.Str
+  in
+    case leftMostStrExp e of
+      Struct _ => true
+    | LetInEnd _ => true
+    | _ => false
+  end
 
 
   fun strDecInsideFunAppWantsSpaceBefore e =
-    let
-      open Ast.Str
-    in
-      case e of
-        DecEmpty => false
-      | DecCore _ => false
-      | _ => true
-    end
+  let
+    open Ast.Str
+  in
+    case e of
+      DecEmpty => false
+    | DecCore _ => false
+    | _ => true
+  end
 
 
   fun strDecIsEmpty e =

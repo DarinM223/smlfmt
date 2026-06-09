@@ -10,21 +10,21 @@ end =
 struct
 
   fun captureOutput {cmdPath, args} =
-    let
-      open MLton.Process
+  let
+    open MLton.Process
 
-      val p = create
-        { path = cmdPath
-        , env = NONE
-        , args = args
-        , stderr = Param.self
-        , stdin = Param.null
-        , stdout = Param.pipe
-        }
+    val p = create
+      { path = cmdPath
+      , env = NONE
+      , args = args
+      , stderr = Param.self
+      , stdin = Param.null
+      , stdout = Param.pipe
+      }
 
-      val output = TextIO.inputAll (Child.textIn (getStdout p))
-    in
-      output
-    end
+    val output = TextIO.inputAll (Child.textIn (getStdout p))
+  in
+    output
+  end
 
 end

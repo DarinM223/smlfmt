@@ -53,20 +53,20 @@ struct
       end
 
   fun textWrap desiredWidth str =
-    let
-      fun finishLine ln =
-        String.concatWith " " (List.rev ln)
-      fun loop lines (currLine, currLen) toks =
-        case toks of
-          tok :: remaining =>
-            if currLen + String.size tok + 1 > desiredWidth then
-              loop (finishLine currLine :: lines) ([], 0) toks
-            else
-              loop lines (tok :: currLine, currLen + String.size tok + 1)
-                remaining
-        | [] => String.concatWith "\n" (List.rev (finishLine currLine :: lines))
-    in
-      loop [] ([], 0) (String.tokens Char.isSpace str)
-    end
+  let
+    fun finishLine ln =
+      String.concatWith " " (List.rev ln)
+    fun loop lines (currLine, currLen) toks =
+      case toks of
+        tok :: remaining =>
+          if currLen + String.size tok + 1 > desiredWidth then
+            loop (finishLine currLine :: lines) ([], 0) toks
+          else
+            loop lines (tok :: currLine, currLen + String.size tok + 1)
+              remaining
+      | [] => String.concatWith "\n" (List.rev (finishLine currLine :: lines))
+  in
+    loop [] ([], 0) (String.tokens Char.isSpace str)
+  end
 
 end

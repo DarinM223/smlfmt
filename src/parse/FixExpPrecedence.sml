@@ -62,125 +62,125 @@ struct
 
 
   fun getInfo e =
-    let
-      open Ast.Exp
-    in
-      case e of
-        Typed {exp, colon, ty} =>
-          let
-            fun leftReplaceWith e = Typed {exp = e, colon = colon, ty = ty}
-          in
-            F { prec = 10
-              , left = SOME {exp = exp, replaceWith = leftReplaceWith}
-              , right = NONE
-              }
-          end
+  let
+    open Ast.Exp
+  in
+    case e of
+      Typed {exp, colon, ty} =>
+        let
+          fun leftReplaceWith e = Typed {exp = e, colon = colon, ty = ty}
+        in
+          F { prec = 10
+            , left = SOME {exp = exp, replaceWith = leftReplaceWith}
+            , right = NONE
+            }
+        end
 
-      | Andalso {left, andalsoo, right} =>
-          let
-            fun leftReplaceWith e =
-              Andalso {left = e, andalsoo = andalsoo, right = right}
-            fun rightReplaceWith e =
-              Andalso {left = left, andalsoo = andalsoo, right = e}
-          in
-            F { prec = 9
-              , left = SOME {exp = left, replaceWith = leftReplaceWith}
-              , right = SOME {exp = right, replaceWith = rightReplaceWith}
-              }
-          end
+    | Andalso {left, andalsoo, right} =>
+        let
+          fun leftReplaceWith e =
+            Andalso {left = e, andalsoo = andalsoo, right = right}
+          fun rightReplaceWith e =
+            Andalso {left = left, andalsoo = andalsoo, right = e}
+        in
+          F { prec = 9
+            , left = SOME {exp = left, replaceWith = leftReplaceWith}
+            , right = SOME {exp = right, replaceWith = rightReplaceWith}
+            }
+        end
 
-      | Orelse {left, orelsee, right} =>
-          let
-            fun leftReplaceWith e =
-              Orelse {left = e, orelsee = orelsee, right = right}
-            fun rightReplaceWith e =
-              Orelse {left = left, orelsee = orelsee, right = e}
-          in
-            F { prec = 8
-              , left = SOME {exp = left, replaceWith = leftReplaceWith}
-              , right = SOME {exp = right, replaceWith = rightReplaceWith}
-              }
-          end
+    | Orelse {left, orelsee, right} =>
+        let
+          fun leftReplaceWith e =
+            Orelse {left = e, orelsee = orelsee, right = right}
+          fun rightReplaceWith e =
+            Orelse {left = left, orelsee = orelsee, right = e}
+        in
+          F { prec = 8
+            , left = SOME {exp = left, replaceWith = leftReplaceWith}
+            , right = SOME {exp = right, replaceWith = rightReplaceWith}
+            }
+        end
 
-      | Handle {exp, handlee, elems, delims, optbar} =>
-          let
-            fun leftReplaceWith e =
-              Handle
-                { exp = e
-                , handlee = handlee
-                , elems = elems
-                , delims = delims
-                , optbar = optbar
-                }
-          in
-            F { prec = 7
-              , left = SOME {exp = exp, replaceWith = leftReplaceWith}
-              , right = NONE
+    | Handle {exp, handlee, elems, delims, optbar} =>
+        let
+          fun leftReplaceWith e =
+            Handle
+              { exp = e
+              , handlee = handlee
+              , elems = elems
+              , delims = delims
+              , optbar = optbar
               }
-          end
+        in
+          F { prec = 7
+            , left = SOME {exp = exp, replaceWith = leftReplaceWith}
+            , right = NONE
+            }
+        end
 
-      | Raise {raisee, exp} =>
-          let
-            fun replaceRightWith e = Raise {raisee = raisee, exp = e}
-          in
-            F { prec = 6
-              , left = NONE
-              , right = SOME {exp = exp, replaceWith = replaceRightWith}
+    | Raise {raisee, exp} =>
+        let
+          fun replaceRightWith e = Raise {raisee = raisee, exp = e}
+        in
+          F { prec = 6
+            , left = NONE
+            , right = SOME {exp = exp, replaceWith = replaceRightWith}
+            }
+        end
+
+    | IfThenElse {iff, exp1, thenn, exp2, elsee, exp3} =>
+        let
+          fun replaceRightWith e =
+            IfThenElse
+              { iff = iff
+              , exp1 = exp1
+              , thenn = thenn
+              , exp2 = exp2
+              , elsee = elsee
+              , exp3 = e
               }
-          end
+        in
+          F { prec = 5
+            , left = NONE
+            , right = SOME {exp = exp3, replaceWith = replaceRightWith}
+            }
+        end
 
-      | IfThenElse {iff, exp1, thenn, exp2, elsee, exp3} =>
-          let
-            fun replaceRightWith e =
-              IfThenElse
-                { iff = iff
-                , exp1 = exp1
-                , thenn = thenn
-                , exp2 = exp2
-                , elsee = elsee
-                , exp3 = e
-                }
-          in
-            F { prec = 5
-              , left = NONE
-              , right = SOME {exp = exp3, replaceWith = replaceRightWith}
-              }
-          end
+    | While {whilee, exp1, doo, exp2} =>
+        let
+          fun replaceRightWith e =
+            While {whilee = whilee, exp1 = exp1, doo = doo, exp2 = e}
+        in
+          F { prec = 4
+            , left = NONE
+            , right = SOME {exp = exp2, replaceWith = replaceRightWith}
+            }
+        end
 
-      | While {whilee, exp1, doo, exp2} =>
-          let
-            fun replaceRightWith e =
-              While {whilee = whilee, exp1 = exp1, doo = doo, exp2 = e}
-          in
-            F { prec = 4
-              , left = NONE
-              , right = SOME {exp = exp2, replaceWith = replaceRightWith}
-              }
-          end
-
-      | _ => F {prec = 0, left = NONE, right = NONE}
-    end
+    | _ => F {prec = 0, left = NONE, right = NONE}
+  end
 
 
   fun maybeRotateLeft e =
-    let
-      val F {prec = rootPrecedence, right, ...} = getInfo e
-    in
-      case right of
-        NONE => e
-      | SOME {exp = rootRight, replaceWith = rootReplaceRightWith} =>
-          let
-            val F {prec = rightPrecedence, left, ...} = getInfo rootRight
-          in
-            case left of
-              NONE => e
-            | SOME {exp = rightLeft, replaceWith = rightReplaceLeftWith} =>
-                if rootPrecedence > rightPrecedence then
-                  rightReplaceLeftWith (rootReplaceRightWith rightLeft)
-                else
-                  e
-          end
-    end
+  let
+    val F {prec = rootPrecedence, right, ...} = getInfo e
+  in
+    case right of
+      NONE => e
+    | SOME {exp = rootRight, replaceWith = rootReplaceRightWith} =>
+        let
+          val F {prec = rightPrecedence, left, ...} = getInfo rootRight
+        in
+          case left of
+            NONE => e
+          | SOME {exp = rightLeft, replaceWith = rightReplaceLeftWith} =>
+              if rootPrecedence > rightPrecedence then
+                rightReplaceLeftWith (rootReplaceRightWith rightLeft)
+              else
+                e
+        end
+  end
 
 
 end

@@ -58,54 +58,54 @@ struct
   type t = source
 
   fun loadFromCharSeq path contents =
-    let
-      val n = Seq.length contents
+  let
+    val n = Seq.length contents
 
-      (** Check that we can use the slice base as the actual base. *)
-      val (_, absoluteOffset, _) = ArraySlice.base contents
-      val _ =
-        if absoluteOffset = 0 then
-          ()
-        else
-          raise Fail
-            "bug in Source.loadFromFile: expected \
-            \ReadFile.contentsSeq to return slice at offset 0"
+    (** Check that we can use the slice base as the actual base. *)
+    val (_, absoluteOffset, _) = ArraySlice.base contents
+    val _ =
+      if absoluteOffset = 0 then
+        ()
+      else
+        raise Fail
+          "bug in Source.loadFromFile: expected \
+          \ReadFile.contentsSeq to return slice at offset 0"
 
-      val newlineIdxs =
-        ArraySlice.full (SeqBasis.filter (0, n) (fn i => i) (fn i =>
-          Seq.nth contents i = #"\n"))
-    in
-      {data = contents, fileName = path, newlineIdxs = newlineIdxs}
-    end
+    val newlineIdxs =
+      ArraySlice.full (SeqBasis.filter (0, n) (fn i => i) (fn i =>
+        Seq.nth contents i = #"\n"))
+  in
+    {data = contents, fileName = path, newlineIdxs = newlineIdxs}
+  end
 
   fun loadFromFile path =
-    let val contents = ReadFile.contentsSeq (FilePath.toHostPath path)
-    in loadFromCharSeq path contents
-    end
+  let val contents = ReadFile.contentsSeq (FilePath.toHostPath path)
+  in loadFromCharSeq path contents
+  end
 
   fun loadFromStdin () =
-    let
-      (* kind of faking it *)
-      val path = FilePath.fromFields ["<stdin>"]
-      val s = TextIO.inputAll TextIO.stdIn
-      val contents = Seq.tabulate (fn i => String.sub (s, i)) (String.size s)
-    in
-      loadFromCharSeq path contents
-    end
+  let
+    (* kind of faking it *)
+    val path = FilePath.fromFields ["<stdin>"]
+    val s = TextIO.inputAll TextIO.stdIn
+    val contents = Seq.tabulate (fn i => String.sub (s, i)) (String.size s)
+  in
+    loadFromCharSeq path contents
+  end
 
   fun make {fileName, contents} = loadFromCharSeq fileName contents
 
   fun fileName (s: source) = #fileName s
 
   fun absoluteStartOffset ({data, ...}: source) =
-    let val (_, off, _) = ArraySlice.base data
-    in off
-    end
+  let val (_, off, _) = ArraySlice.base data
+  in off
+  end
 
   fun absoluteEndOffset ({data, ...}: source) =
-    let val (_, off, n) = ArraySlice.base data
-    in off + n
-    end
+  let val (_, off, n) = ArraySlice.base data
+  in off + n
+  end
 
   fun absoluteStart (s as {newlineIdxs, ...}: source) =
     if absoluteStartOffset s = 0 then
@@ -142,29 +142,27 @@ struct
     CharVector.tabulate (length s, nth s)
 
   fun wholeFile ({data, fileName, newlineIdxs}: source) =
-    let
-      val (a, _, _) = ArraySlice.base data
-    in
-      {data = ArraySlice.full a, fileName = fileName, newlineIdxs = newlineIdxs}
-    end
+  let val (a, _, _) = ArraySlice.base data
+  in {data = ArraySlice.full a, fileName = fileName, newlineIdxs = newlineIdxs}
+  end
 
   fun wholeLine (s as {newlineIdxs, ...}: source) lineNum1 =
-    let
-      val base = wholeFile s
+  let
+    val base = wholeFile s
 
-      (** Back to 0-indexing *)
-      val lineNum0 = lineNum1 - 1
+    (** Back to 0-indexing *)
+    val lineNum0 = lineNum1 - 1
 
-      val lineStartOffset =
-        if lineNum0 = 0 then 0 else 1 + Seq.nth newlineIdxs (lineNum0 - 1)
+    val lineStartOffset =
+      if lineNum0 = 0 then 0 else 1 + Seq.nth newlineIdxs (lineNum0 - 1)
 
-      val lineEndOffset =
-        if lineNum0 >= Seq.length newlineIdxs then length base
-        else Seq.nth newlineIdxs lineNum0
+    val lineEndOffset =
+      if lineNum0 >= Seq.length newlineIdxs then length base
+      else Seq.nth newlineIdxs lineNum0
 
-    in
-      slice base (lineStartOffset, lineEndOffset - lineStartOffset)
-    end
+  in
+    slice base (lineStartOffset, lineEndOffset - lineStartOffset)
+  end
 
 
   fun abut (src1, src2) =
@@ -184,26 +182,26 @@ struct
 
 
   fun lineRanges (s as {newlineIdxs, ...}: source) =
-    let
-      (** convert back to 0-indexing (-_-) *)
-      val {line = lnStart, ...} = absoluteStart s
-      val lnStart = lnStart - 1
-      val {line = lnEnd, ...} = absoluteEnd s
-      val lnEnd = lnEnd - 1
+  let
+    (** convert back to 0-indexing (-_-) *)
+    val {line = lnStart, ...} = absoluteStart s
+    val lnStart = lnStart - 1
+    val {line = lnEnd, ...} = absoluteEnd s
+    val lnEnd = lnEnd - 1
 
-      val numLines = lnEnd - lnStart + 1
+    val numLines = lnEnd - lnStart + 1
 
-      fun start i =
-        if i = 0 then absoluteStartOffset s
-        else 1 + Seq.nth newlineIdxs (lnStart + i - 1)
+    fun start i =
+      if i = 0 then absoluteStartOffset s
+      else 1 + Seq.nth newlineIdxs (lnStart + i - 1)
 
-      fun endd i =
-        if i = numLines - 1 then absoluteEndOffset s
-        else Seq.nth newlineIdxs (lnStart + i)
+    fun endd i =
+      if i = numLines - 1 then absoluteEndOffset s
+      else Seq.nth newlineIdxs (lnStart + i)
 
-      val off = absoluteStartOffset s
-    in
-      Seq.tabulate (fn i => (start i - off, endd i - off)) numLines
-    end
+    val off = absoluteStartOffset s
+  in
+    Seq.tabulate (fn i => (start i - off, endd i - off)) numLines
+  end
 
 end

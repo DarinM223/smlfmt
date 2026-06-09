@@ -38,26 +38,24 @@ struct
              ++ token colon ++ showSigExpInDec tab sigexp))
 
   fun showFunDec tab (Ast.Fun.DecFunctor {functorr, elems, delims}) =
-    let
-      fun showFunctor _
-        (starter, {funid, lparen, funarg, rparen, constraint, eq, strexp}) =
-        at tab
-          (token starter ++ token funid
-           ++ (if funArgWantsSpaceBefore funarg then space else nospace)
-           ++
-           newTab tab (fn inner =>
-             at inner
-               (token lparen ++ nospace ++ showFunArg inner funarg ++ nospace
-                ++ token rparen))
-           ++ showOption (showConstraintInStrDec tab) constraint ++ token eq
-           ++
-           (if strExpWantsSameTabAsDec strexp then
-              at tab (showStrExp tab strexp)
-            else
-              withNewChild showStrExp tab strexp))
-    in
-      Seq.iterate op++ (showFunctor true (functorr, Seq.nth elems 0))
-        (Seq.map (showFunctor false) (Seq.zip (delims, Seq.drop elems 1)))
-    end
+  let
+    fun showFunctor _
+      (starter, {funid, lparen, funarg, rparen, constraint, eq, strexp}) =
+      at tab
+        (token starter ++ token funid
+         ++ (if funArgWantsSpaceBefore funarg then space else nospace)
+         ++
+         newTab tab (fn inner =>
+           at inner
+             (token lparen ++ nospace ++ showFunArg inner funarg ++ nospace
+              ++ token rparen))
+         ++ showOption (showConstraintInStrDec tab) constraint ++ token eq
+         ++
+         (if strExpWantsSameTabAsDec strexp then at tab (showStrExp tab strexp)
+          else withNewChild showStrExp tab strexp))
+  in
+    Seq.iterate op++ (showFunctor true (functorr, Seq.nth elems 0))
+      (Seq.map (showFunctor false) (Seq.zip (delims, Seq.drop elems 1)))
+  end
 
 end
