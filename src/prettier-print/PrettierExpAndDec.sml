@@ -231,6 +231,20 @@ struct
       | _ => false
     end
 
+
+  fun deindentLetInEndStyle exp style =
+    case exp of
+      Ast.Exp.LetInEnd _ =>
+        Tab.Style.combine
+          ( Tab.Style.combine
+              ( Tab.Style.indentedExactlyBy (Int.max
+                  (Tab.Style.minIndent style - 2, 0))
+              , Tab.Style.rigid
+              )
+          , style
+          )
+    | _ => style
+
   (* ====================================================================== *)
 
   (* This function is duplicated in PrettierSig. *)
@@ -987,7 +1001,7 @@ struct
         token colon ++ withNewChild showTy tab ty
 
       fun showClause mainTab clauseTab clauseChildStyleFirst
-        clauseChildStyleRest isFirst (front, {fname_args, ty, eq, exp}) =
+        clauseChildStyleRest isLone isFirst (front, {fname_args, ty, eq, exp}) =
         let
           fun afterFront tab clauseChildStyle =
             let
@@ -995,7 +1009,8 @@ struct
                 if isBiggishExp exp then
                   Tab.Style.combine
                     ( Tab.Style.combine (Tab.Style.indented, Tab.Style.rigid)
-                    , clauseChildStyle
+                    , if isLone then deindentLetInEndStyle exp clauseChildStyle
+                      else clauseChildStyle
                     )
                 else
                   clauseChildStyle
@@ -1013,8 +1028,9 @@ struct
 
       fun mkFunction (starter, {elems = innerElems, delims, optbar}) =
         let
+          val isLoneClause = Seq.length innerElems <= 1
           val clauseChildStyleFirst =
-            if Seq.length innerElems <= 1 andalso not (Option.isSome optbar) then
+            if isLoneClause andalso not (Option.isSome optbar) then
               Tab.Style.inplace
             else
               indentedAtLeastBy 6
@@ -1034,7 +1050,7 @@ struct
               let
                 val showClause' =
                   showClause mainTab clauseTab clauseChildStyleFirst
-                    clauseChildStyleRest
+                    clauseChildStyleRest isLoneClause
               in
                 case optbar of
                   NONE =>
